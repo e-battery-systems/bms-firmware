@@ -34,6 +34,8 @@ static THINGSET_DEFINE_FLOAT_ARRAY(cell_voltages_arr, 3, bms.ic_data.cell_voltag
 static THINGSET_DEFINE_FLOAT_ARRAY(cell_temps_arr, 1, bms.ic_data.cell_temps,
                                    ARRAY_SIZE(bms.ic_data.cell_temps));
 
+static THINGSET_DEFINE_FLOAT_ARRAY(ocv_points_arr, 3, bms.ocv_points, ARRAY_SIZE(bms.ocv_points));
+
 // used for xInitConf functions
 static float new_capacity = 0;
 
@@ -74,6 +76,9 @@ THINGSET_ADD_GROUP(TS_ID_ROOT, APP_ID_CONF, "Conf", &data_objects_update_conf);
 THINGSET_ADD_ITEM_FLOAT(APP_ID_CONF, APP_ID_CONF_NOMINAL_CAPACITY, "sNominalCapacity_Ah",
                         &bms.nominal_capacity_Ah, 1, THINGSET_ANY_R | THINGSET_ANY_W,
                         TS_SUBSET_NVM);
+
+THINGSET_ADD_ITEM_ARRAY(APP_ID_CONF, APP_ID_CONF_OCV_POINTS, "sOcvPoints_V", &ocv_points_arr,
+                        THINGSET_ANY_R | THINGSET_ANY_W, TS_SUBSET_NVM);
 
 // current limits
 

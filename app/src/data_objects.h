@@ -63,7 +63,7 @@
 #define APP_ID_CONF_PRESET_NMC_CAPACITY     0xA1
 #define APP_ID_CONF_PRESET_LFP              0xA2
 #define APP_ID_CONF_PRESET_LFP_CAPACITY     0xA3
-#define APP_ID_CONF_OCV_CUSTOM_POINTS       0xB0
+#define APP_ID_CONF_OCV_POINTS              0xB0
 
 /* Measurement data */
 #define APP_ID_MEAS                  0x07
