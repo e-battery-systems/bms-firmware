@@ -78,13 +78,13 @@ struct bms_context
     float nominal_capacity_Ah;
 
     /**
-     * Pointer to an array containing the Open Circuit Voltage of the cell vs. SOC. The array
-     * must be spaced the same as the soc_points.
+     * Array containing the Open Circuit Voltage of the cell vs. SOC. The array must be spaced the
+     * same as the soc_points.
      */
-    float *ocv_points;
+    float ocv_points[OCV_POINTS];
 
-    /** Pointer to an array containing the State of Charge points for the OCV. */
-    float *soc_points;
+    /** Array containing the State of Charge points for the OCV. */
+    float soc_points[OCV_POINTS];
 
     /** BMS IC configuration applied during start-up. */
     struct bms_ic_conf ic_conf;

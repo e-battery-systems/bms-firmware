@@ -58,6 +58,29 @@ float interpolate(const float a[], const float b[], size_t size, float value_a);
  */
 const char *byte2bitstr(uint8_t b);
 
+/**
+ * @brief Check if a buffer is entirely zeroed.
+ *
+ * This function checks if all elements in a buffer are zero. It first casts the buffer
+ * to a size_t pointer and checks the first size_t-sized block. If this block is zero,
+ * it then compares the rest of the buffer with its initial part using memcmp.
+ * The function requires that the buffer size is at least as large as size_t.
+ * If the buffer size is less than size_t, the function returns EINVAL.
+ *
+ * @param buf A pointer to the buffer (uint8_t*) to be checked.
+ * @param size The size of the buffer in bytes.
+ * @return Returns 1 (true) if the buffer is entirely zeroed, 0 (false) if not,
+ *         or EINVAL if the buffer size is less than size_t.
+ */
+static inline int is_empty(uint8_t *buf, size_t size)
+{
+    if (size < sizeof(size_t)) {
+        return -EINVAL;
+    }
+
+    return !(*(size_t *)buf || !!memcmp(buf, buf + sizeof(size_t), size - sizeof(size_t)));
+}
+
 #ifdef __cplusplus
 }
 #endif

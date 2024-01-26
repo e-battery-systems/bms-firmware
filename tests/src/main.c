@@ -14,6 +14,7 @@
 #include "unity.h"
 
 #include <stdio.h>
+#include <string.h>
 
 #include <zephyr/device.h>
 #include <zephyr/kernel.h>
@@ -26,10 +27,9 @@ static const struct device *bms_ic = DEVICE_DT_GET(DT_ALIAS(bms_ic));
 
 struct bms_context bms;
 
-float OCV[] = { // 100, 95, ..., 0 %
-    3.392, 3.314, 3.309, 3.308, 3.304, 3.296, 3.283, 3.275, 3.271, 3.268, 3.265,
-    3.264, 3.262, 3.252, 3.240, 3.226, 3.213, 3.190, 3.177, 3.132, 2.833
-};
+#define TEST_OCV_POINTS \
+    3.392, 3.314, 3.309, 3.308, 3.304, 3.296, 3.283, 3.275, 3.271, 3.268, 3.265, 3.264, 3.262, \
+        3.252, 3.240, 3.226, 3.213, 3.190, 3.177, 3.132, 2.833
 
 void setUp(void)
 {}
@@ -62,7 +62,8 @@ void setup()
     bms.ic_conf.chg_ot_limit = 45;
     bms.ic_conf.temp_limit_hyst = 2;
 
-    bms.ocv_points = OCV;
+    float ocv[] = { TEST_OCV_POINTS };
+    memcpy(bms.ocv_points, ocv, sizeof(bms.ocv_points));
 
     bms.nominal_capacity_Ah = 45.0;
     bms.ic_data.connected_cells = 4;

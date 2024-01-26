@@ -9,19 +9,25 @@
 
 #include "helper.h"
 
+#include <assert.h>
 #include <stdio.h>
 
 LOG_MODULE_REGISTER(bms, CONFIG_LOG_DEFAULT_LEVEL);
 
 extern const struct device *bms_ic;
 
-static float ocv_lfp[OCV_POINTS] = { 3.392F, 3.314F, 3.309F, 3.308F, 3.304F, 3.296F, 3.283F,
-                                     3.275F, 3.271F, 3.268F, 3.265F, 3.264F, 3.262F, 3.252F,
-                                     3.240F, 3.226F, 3.213F, 3.190F, 3.177F, 3.132F, 2.833F };
+#define OCV_LFP \
+    3.392F, 3.314F, 3.309F, 3.308F, 3.304F, 3.296F, 3.283F, 3.275F, 3.271F, 3.268F, 3.265F, \
+        3.264F, 3.262F, 3.252F, 3.240F, 3.226F, 3.213F, 3.190F, 3.177F, 3.132F, 2.833F
 
-static float ocv_nmc[OCV_POINTS] = { 4.198F, 4.135F, 4.089F, 4.056F, 4.026F, 3.993F, 3.962F,
-                                     3.924F, 3.883F, 3.858F, 3.838F, 3.819F, 3.803F, 3.787F,
-                                     3.764F, 3.745F, 3.726F, 3.702F, 3.684F, 3.588F, 2.800F };
+#define OCV_NMC \
+    4.198F, 4.135F, 4.089F, 4.056F, 4.026F, 3.993F, 3.962F, 3.924F, 3.883F, 3.858F, 3.838F, \
+        3.819F, 3.803F, 3.787F, 3.764F, 3.745F, 3.726F, 3.702F, 3.684F, 3.588F, 2.800F
+
+BUILD_ASSERT(ARRAY_SIZE(((struct bms_context *)0)->ocv_points) == OCV_POINTS,
+             "ocv_points array in bms_context is too small");
+BUILD_ASSERT(ARRAY_SIZE(((struct bms_context *)0)->soc_points) == OCV_POINTS,
+             "soc_points array in bms_context is too small");
 
 void bms_init_config(struct bms_context *bms, enum bms_cell_type type, float nominal_capacity_Ah)
 {
@@ -55,6 +61,8 @@ void bms_init_config(struct bms_context *bms, enum bms_cell_type type, float nom
     bms->ic_conf.cell_ov_delay_ms = 2000;
     bms->ic_conf.cell_uv_delay_ms = 2000;
 
+    memset(bms->ocv_points, 0, sizeof(bms->ocv_points));
+
     switch (type) {
         case CELL_TYPE_LFP:
             bms->ic_conf.cell_ov_limit = 3.80F;
@@ -68,7 +76,10 @@ void bms_init_config(struct bms_context *bms, enum bms_cell_type type, float nom
              * self-discharge
              */
             bms->ic_conf.cell_uv_limit = 2.50F;
-            bms->ocv_points = ocv_lfp;
+            {
+                float ocv_points[OCV_POINTS] = { OCV_LFP };
+                memcpy(bms->ocv_points, ocv_points, sizeof(bms->ocv_points));
+            }
             break;
         case CELL_TYPE_NMC:
             bms->ic_conf.cell_ov_limit = 4.25F;
@@ -78,7 +89,10 @@ void bms_init_config(struct bms_context *bms, enum bms_cell_type type, float nom
             bms->ic_conf.cell_uv_reset = 3.50F;
             bms->ic_conf.cell_dis_voltage_limit = 3.20F;
             bms->ic_conf.cell_uv_limit = 3.00F;
-            bms->ocv_points = ocv_nmc;
+            {
+                float ocv_points[OCV_POINTS] = { OCV_NMC };
+                memcpy(bms->ocv_points, ocv_points, sizeof(bms->ocv_points));
+            }
             break;
         case CELL_TYPE_LTO:
             bms->ic_conf.cell_ov_limit = 2.85F;
@@ -89,7 +103,6 @@ void bms_init_config(struct bms_context *bms, enum bms_cell_type type, float nom
             bms->ic_conf.cell_dis_voltage_limit = 2.00F;
             bms->ic_conf.cell_uv_limit = 1.90F;
             // ToDo: Use typical OCV curve for LTO cells
-            bms->ocv_points = NULL;
             break;
         case CELL_TYPE_CUSTOM:
             break;
