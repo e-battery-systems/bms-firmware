@@ -6,5 +6,8 @@
 
 zephyr_include_directories(include)
 
+zephyr_compile_definitions(MCUBOOT_LOG_LEVEL=0)
+zephyr_compile_definitions(LOG_LOCAL_LEVEL=0)
+
 add_subdirectory(drivers)
 add_subdirectory(lib)
